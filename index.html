@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>賣艸人家 - 植感生活診斷室</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #FDFBF7;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 隱藏捲軸 */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 動畫效果 */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
+
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
+        
+        /* 圖片進場與懸浮特效 */
+        .img-fade-in { animation: imgFade 1s ease-out forwards; }
+        @keyframes imgFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .product-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8 text-[#1A3C34]">
+
+    <div id="app" class="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border-[12px] border-[#1A3C34] min-h-[800px] flex flex-col">
+        <!-- 內容由 JS 渲染 -->
+    </div>
+
+    <script>
+        // --- 1. 狀態管理 ---
+        const state = {
+            step: 'intro',
+            selectedId: null,
+            showIngredients: false,
+            lang: 'zh'
+        };
+
+        // --- 2. 語系資料 ---
+        const t = {
+            zh: {
+                subBrand: 'HERBARTIST', title: '植感生活<br/>診斷室', subtitle: '輕觸螢幕開啟您的草本對話', touchStart: 'Touch to Start',
+                questionTitle: '此刻的你，<br/>感覺如何？', questionSub: '請依直覺點選一張最符合的狀態', processing: '正在為您調配處方...', processingSub: 'Formulating Prescription',
+                recommendation: 'Recommendation', checkIngredients: '查看成分與價格', backToSelection: '選其他症狀', backToIntro: '返回介紹',
+                ingredientsTitle: '嚴選成分', originNote: '產地嚴選 ‧ 無化學添加', specTitle: 'Product Spec', brewingTitle: '沖泡建議：',
+                cta: '如需購買，請直接洽詢櫃台人員', home: '回首頁',
+                disclaimer: '免責聲明：本產品為一般食品，旨在調理生活機能。若有特殊疾病或懷孕狀況，建議諮詢醫師後飲用。'
+            },
+            en: {
+                subBrand: 'HERBARTIST', title: 'Herbal Life<br/>Diagnosis', subtitle: 'Start your herbal dialogue', touchStart: 'Touch to Start',
+                questionTitle: 'How do you feel<br/>right now?', questionSub: 'Intuitively choose the card that fits you best', processing: 'Blending...', processingSub: 'Formulating Prescription',
+                recommendation: 'Recommendation', checkIngredients: 'Ingredients & Price', backToSelection: 'Choose Another', backToIntro: 'Back',
+                ingredientsTitle: 'Ingredients', originNote: 'Selected Origins ‧ No Additives', specTitle: 'Product Spec', brewingTitle: 'Brewing:',
+                cta: 'Please contact staff for purchase', home: 'Home',
+                disclaimer: 'Disclaimer: This is a food product for well-being. Consult a physician if pregnant or having medical conditions.'
+            },
+            jp: {
+                subBrand: 'HERBARTIST', title: '漢方ライフ<br/>診断室', subtitle: 'ハーブとの対話を始めましょう', touchStart: 'Touch to Start',
+                questionTitle: '今の気分は<br/>いかがですか？', questionSub: '直感で最も当てはまるカードを選んでください', processing: '調合中...', processingSub: 'Formulating Prescription',
+                recommendation: 'Recommendation', checkIngredients: '成分と価格を見る', backToSelection: '他の症状を選ぶ', backToIntro: '戻る',
+                ingredientsTitle: '厳選成分', originNote: '厳選された産地 ‧ 無添加', specTitle: 'Product Spec', brewingTitle: '飲み方：',
+                cta: 'ご購入の際はスタッフにお声がけください', home: 'ホーム',
+                disclaimer: '免責事項：本品は健康食品です。疾患のある方や妊娠中の方は医師にご相談の上お飲みください。'
+            }
+        };
+
+        // --- 3. 產品資料庫 (圖片請依此命名並放在同一資料夾) ---
+        // 為了預覽，我預設使用 Unsplash 連結，您可以直接替換為您的 product_*.png
+        const diagnosisData = [
+            {
+                id: 'heavy', icon: 'wind', color: 'bg-green-50', accent: 'text-green-800', border: 'border-green-200',
+                image: 'product_heavy.png', 
+                content: {
+                    zh: { label: '身體沉重', subLabel: 'Heavy Body', product: '阿公青草茶', engName: "Grandpa's Herbal Tea", slogan: '草本清香 ‧ 回甘順口', desc: '熬夜後、飲食油膩時的最佳夥伴。幫助身體回到清爽狀態，去除多餘的負擔。', ingredients: ['仙草', '鳳尾草', '白鶴靈芝', '黃花蜜菜', '甜菊葉', '紅田烏', '珠仔草'], specs: [{ name: '經典 (10入)', desc: '需煮沸 (1200ml) ‧ 味道最濃郁', price: 'NT$ 480' }, { name: '輕量 (10入)', desc: '馬克杯沖泡用 ‧ 方便快速', price: 'NT$ 300' }], brewing: '【經典】1200ml水放入茶包，滾後轉中火12分鐘撈起。<br/>【輕量】熱水沖泡5-8分鐘即可。' },
+                    en: { label: 'Heavy Body', subLabel: 'Feeling Sluggish', product: "阿公青草茶", engName: "Grandpa's Herbal Tea", slogan: 'Herbal Aroma ‧ Smooth', desc: 'Best companion after staying up late. Helps the body return to a refreshed state.', ingredients: ['Mesona', 'Pteris', 'White Crane Lingzhi', 'Wedelia', 'Stevia', 'Alternanthera', 'Phyllanthus'], specs: [{ name: 'Classic (10 packs)', desc: 'Boiling required (1200ml)', price: 'NT$ 480' }, { name: 'Light (10 packs)', desc: 'Mug brewing type', price: 'NT$ 300' }], brewing: '[Classic] Boil with 1200ml water for 12 mins.<br/>[Light] Brew with hot water for 5-8 mins.' },
+                    jp: { label: '体がだるい', subLabel: 'Heavy Body', product: '阿公青草茶', engName: "Grandpa's Herbal Tea", slogan: 'ハーブの香り ‧ スッキリとした後味', desc: '夜更かしや脂っこい食事の後に。体に溜まった熱を冷まし、軽やかな状態へ戻します。', ingredients: ['仙草', 'イノモトソウ', '白鶴霊芝', 'クマノギク', 'ステビア', 'ツルノゲイトウ', 'コミカンソウ'], specs: [{ name: 'クラシック (10入)', desc: '要煮沸 (1200ml) ‧ 濃厚な味わい', price: 'NT$ 480' }, { name: 'ライト (10入)', desc: 'マグカップ用 ‧ 手軽に楽しめる', price: 'NT$ 300' }], brewing: '【クラシック】1200mlの水で沸騰後、弱火で12分。<br/>【ライト】お湯で5-8分抽出。' }
+                }
+            },
+            {
+                id: 'tired', icon: 'coffee', color: 'bg-stone-100', accent: 'text-stone-800', border: 'border-stone-300',
+                image: 'product_tired.png',
+                content: {
+                    zh: { label: '缺乏元氣', subLabel: 'Low Energy', product: '黑豆牛蒡茶', engName: 'Black Bean & Burdock', slogan: '焙炒香氣 ‧ 溫潤厚實', desc: '適合久坐、外食族。作為日常的溫和滋養，找回穩定的節奏。', ingredients: ['黑大豆', '牛蒡', '大麥'], specs: [{ name: '盒裝 (10入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 300' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    en: { label: 'Low Energy', subLabel: 'Feeling Tired', product: '黑豆牛蒡茶', engName: 'Black Bean & Burdock', slogan: 'Roasted Aroma ‧ Warm & Rich', desc: 'Perfect for sedentary office workers. Gentle nourishment to restore your daily rhythm.', ingredients: ['Black Soybean', 'Burdock Root', 'Barley'], specs: [{ name: 'Box (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                    jp: { label: '元気がない', subLabel: 'Low Energy', product: '黑豆牛蒡茶', engName: 'Black Bean & Burdock', slogan: '香ばしい香り ‧ 温かみのある味', desc: '座りっぱなしの方や外食が多い方に。日常の優しい滋養として、リズムを整えます。', ingredients: ['黒豆', 'ごぼう', '大麦'], specs: [{ name: '箱入り (10入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 300' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                }
+            },
+            {
+                id: 'full', icon: 'leaf', color: 'bg-amber-50', accent: 'text-amber-800', border: 'border-amber-200',
+                image: 'product_full.png',
+                content: {
+                    zh: { label: '大餐過後', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: '麥味飄香 ‧ 決明清爽', desc: '飯後來一杯，解膩又輕盈。讓身體的負擔像落葉般自然代謝。', ingredients: ['大麥', '玉米鬚', '決明子'], specs: [{ name: '盒裝 (10入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 300' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    en: { label: 'After Meal', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: 'Barley Scent ‧ Refreshing', desc: 'A cup after meals to relieve greasiness. Let the body burden metabolize naturally.', ingredients: ['Barley', 'Corn Silk', 'Cassia Seed'], specs: [{ name: 'Box (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                    jp: { label: '食後の重み', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: '麦の香り ‧ すっきり爽やか', desc: '食後の一杯に。脂っこさを消し、体を軽やかに保ちます。', ingredients: ['大麦', 'トウモロコシのひげ', '決明子'], specs: [{ name: '箱入り (10入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 300' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                }
+            },
+            {
+                id: 'eye', icon: 'sun', color: 'bg-yellow-50', accent: 'text-yellow-700', border: 'border-yellow-200',
+                image: 'product_eye.png',
+                content: {
+                    zh: { label: '眼神疲憊', subLabel: 'Eye Strain', product: '杭菊枸杞茶', engName: 'Chrysanthemum & Goji', slogan: '花香淡雅 ‧ 自然甘甜', desc: '長時間用眼、需要放鬆時的溫柔選擇。淡淡的花香撫平視覺的躁動。', ingredients: ['杭菊', '枸杞', '決明子'], specs: [{ name: '盒裝 (10入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 300' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    en: { label: 'Eye Strain', subLabel: 'Screen Time', product: '杭菊枸杞茶', engName: 'Chrysanthemum & Goji', slogan: 'Floral Scent ‧ Sweet', desc: 'A gentle choice for tired eyes from screen time. The floral scent soothes visual agitation.', ingredients: ['Chrysanthemum', 'Goji Berry', 'Cassia Seed'], specs: [{ name: 'Box (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                    jp: { label: '目の疲れ', subLabel: 'Eye Strain', product: '杭菊枸杞茶', engName: 'Chrysanthemum & Goji', slogan: '花の香り ‧ 自然な甘み', desc: 'スマホやPCで目が疲れた時に。優しい花の香りが視覚の疲れを癒します。', ingredients: ['菊花', 'クコの実', '決明子'], specs: [{ name: '箱入り (10入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 300' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                }
+            },
+            {
+                id: 'cold', icon: 'heart', color: 'bg-red-50', accent: 'text-red-800', border: 'border-red-200',
+                image: 'product_cold.png',
+                content: {
+                    zh: { label: '手腳冰冷', subLabel: 'Cold Hands', product: '紅棗南薑茶', engName: 'Red Date & Galangal Tea', slogan: '暖身防護 ‧ 溫潤舒活', desc: '老薑的暖意加上紅棗的甘甜，由內而外升溫。適合空調房久坐、需要好氣色的妳。', ingredients: ['紅棗', '南薑', '魚腥草', '甘草', '桑葉'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    en: { label: 'Feeling Cold', subLabel: 'Cold Hands', product: '紅棗南薑茶', engName: 'Red Date & Galangal Tea', slogan: 'Warming ‧ Comforting', desc: 'The warmth of old ginger meets red dates. Perfect for AC rooms and glowing skin.', ingredients: ['Red Date', 'Galangal', 'Houttuynia', 'Licorice', 'Mulberry Leaf'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                    jp: { label: '冷え性', subLabel: 'Cold Hands', product: '紅棗南薑茶', engName: 'ナツメと南姜の茶', slogan: '温活 ‧ 潤い', desc: '生姜の温かさとナツメの甘さ。冷房対策や顔色を良くしたい方に最適です。', ingredients: ['ナツメ', '南姜', 'ドクダミ', '甘草', '桑の葉'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                }
+            },
+            {
+                id: 'sleep', icon: 'moon', color: 'bg-indigo-50', accent: 'text-indigo-800', border: 'border-indigo-200',
+                image: 'product_sleep.png',
+                content: {
+                    zh: { label: '思緒紛亂', subLabel: 'Insomnia', product: '龍眼花洋甘菊茶', engName: 'Longan & Chamomile Tea', slogan: '靜謐之夜 ‧ 夢境引導', desc: '龍眼花的蜜香交織洋甘菊的安撫，讓緊繃的思緒慢慢鬆開。不含咖啡因，是睡前最溫柔的儀式。', ingredients: ['龍眼花', '洋甘菊', '大花咸豐草', '百合'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    en: { label: 'Restless Mind', subLabel: 'Insomnia', product: '龍眼花洋甘菊茶', engName: 'Longan & Chamomile Tea', slogan: 'Silent Night ‧ Dream Guide', desc: 'Honey scent of Longan flowers meets Chamomile. Caffeine-free, gentle ritual before bed.', ingredients: ['Longan Flower', 'Chamomile', 'Bidens Alba', 'Lily Bulb'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                    jp: { label: '考え事が多い', subLabel: 'Insomnia', product: '龍眼花洋甘菊茶', engName: '龍眼花とカモミール茶', slogan: '静寂の夜 ‧ 夢への誘い', desc: '龍眼花の蜜の香りとカモミールの安らぎ。ノンカフェインで、お休み前の優しい儀式に。', ingredients: ['龍眼花', 'カモミール', 'タチアワユキセンダングサ', '百合'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                }
+            },
+            {
+                id: 'period', icon: 'star', color: 'bg-orange-50', accent: 'text-orange-800', border: 'border-orange-200',
+                image: 'product_period.png',
+                content: {
+                    zh: { label: '月月不適', subLabel: 'Period Care', product: '土肉桂枸杞茶', engName: 'Cinnamon & Goji Tea', slogan: '溫柔調理 ‧ 暖心呵護', desc: '台灣原生土肉桂的獨特香氣，像暖暖包一樣貼心，陪伴妳度過敏感時刻。溫潤不燥熱。', ingredients: ['土肉桂', '甘草', '枸杞', '洋甘菊', '玫瑰果'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    en: { label: 'Period Care', subLabel: 'Monthly Care', product: '土肉桂枸杞茶', engName: 'Cinnamon & Goji Tea', slogan: 'Gentle Care ‧ Warming', desc: 'Unique aroma of Indigenous Cinnamon. Like a warm hug during sensitive times.', ingredients: ['Indigenous Cinnamon', 'Licorice', 'Goji Berry', 'Chamomile', 'Rosehip'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                    jp: { label: '女性の悩み', subLabel: 'Period Care', product: '土肉桂枸杞茶', engName: '台湾シナモンクコ茶', slogan: '優しい調理 ‧ 心温まるケア', desc: '台湾原生シナモンの独特な香り。敏感な時期に、カイロのように寄り添います。', ingredients: ['台湾シナモン', '甘草', 'クコの実', 'カモミール', 'ローズヒップ'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                }
+            },
+            {
+                id: 'party', icon: 'droplets', color: 'bg-emerald-900', accent: 'text-emerald-100', border: 'border-emerald-700',
+                image: 'product_party.png',
+                content: {
+                    zh: { label: '想喝一杯', subLabel: 'Chill Vibes', product: '青草茶啤酒', engName: 'Herbal Sparkling Beer', slogan: '都會微醺 ‧ 泡沫綿密', desc: '將老祖宗的智慧打入綿密氣泡。大人味的清爽特調，派對狂歡的獨特選擇。', ingredients: ['仙草', '鳳尾草', '白鶴靈芝', '黃花蜜菜', '甜菊葉', '紅田烏', '珠仔草', '酵母'], specs: [{ name: '瓶裝 (330ml)', desc: '酒精濃度：4.8%', price: 'NT$ 180' }], brewing: '冷藏飲用風味更佳，開瓶後請盡快飲用。' },
+                    en: { label: 'Chill Vibes', subLabel: 'Sparkling Beer', product: '青草茶啤酒', engName: 'Herbal Sparkling Beer', slogan: 'Urban Chill ‧ Creamy', desc: 'Ancestral wisdom infused into bubbles. A refreshing herbal beer for a unique party vibe.', ingredients: ['Mesona', 'Pteris', 'White Crane Lingzhi', 'Wedelia', 'Stevia', 'Alternanthera', 'Phyllanthus', 'Yeast'], specs: [{ name: 'Bottle (330ml)', desc: 'ABV: 4.8%', price: 'NT$ 180' }], brewing: 'Best served chilled. Drink immediately after opening.' },
+                    jp: { label: '一杯飲みたい', subLabel: 'Chill Vibes', product: '青草茶啤酒', engName: 'Herbal Sparkling Beer', slogan: '都会の微酔 ‧ クリーミー', desc: '先人の知恵を炭酸に込めました。爽やかなハーバルビールで、特別なひとときを。', ingredients: ['仙草', 'イノモトソウ', '白鶴霊芝', 'クマノギク', 'ステビア', 'ツルノゲイトウ', 'コミカンソウ', '酵母'], specs: [{ name: '瓶 (330ml)', desc: 'アルコール分：4.8%', price: 'NT$ 180' }], brewing: '冷やして飲むのがおすすめ。開封後はお早めに。' }
+                }
+            }
+        ];
+
+        // --- 4. 邏輯控制 ---
+        const app = document.getElementById('app');
+
+        window.setLang = function(newLang) { state.lang = newLang; render(); };
+        window.setStep = function(newStep) { state.step = newStep; render(); };
+        window.handleSelect = function(id) { state.selectedId = id; state.showIngredients = false; setStep('processing'); setTimeout(() => { setStep('result'); }, 1500); };
+        window.reset = function() { state.step = 'intro'; state.selectedId = null; state.showIngredients = false; render(); };
+        window.backToSelection = function() { state.step = 'selection'; state.selectedId = null; state.showIngredients = false; render(); };
+        window.toggleIngredients = function(show) { state.showIngredients = show; render(); };
+
+        // V21: 強制正方形卡片 (aspect-square)
+        function getCardSizeClass() { return 'aspect-square'; }
+
+        // --- 5. 渲染函數 ---
+        function renderHeader() {
+            return `
+                <div class="absolute top-0 w-full pl-8 pr-4 py-8 flex justify-between items-center z-20 pointer-events-none">
+                    <div class="flex flex-col">
+                        <img src="image.png" alt="賣艸人家 Logo" class="h-20 w-auto object-contain" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="hidden flex-col">
+                            <span class="text-xl font-bold tracking-[0.2em] text-[#1A3C34]">賣艸人家</span>
+                            <span class="text-xs text-[#D4AF37] tracking-[0.3em] uppercase mt-1">HERBARTIST</span>
+                        </div>
+                    </div>
+                    <div class="pointer-events-auto flex gap-2 items-center">
+                        <div class="bg-white/90 backdrop-blur rounded-full shadow-sm border border-[#1A3C34]/10 flex overflow-hidden">
+                            ${['zh', 'en', 'jp'].map(l => `<button onclick="setLang('${l}')" class="px-3 py-1.5 text-[10px] font-bold uppercase transition-colors ${state.lang === l ? 'bg-[#1A3C34] text-[#D4AF37]' : 'text-gray-400 hover:text-[#1A3C34]'}">${l === 'zh' ? '中' : l}</button>`).join('')}
+                        </div>
+                        ${state.step !== 'intro' ? `<button onclick="reset()" class="bg-white/90 backdrop-blur p-2 rounded-full hover:bg-[#D4AF37] hover:text-white transition shadow-sm border border-[#1A3C34]/10 flex items-center group"><i data-lucide="refresh-cw" class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500"></i></button>` : ''}
+                    </div>
+                </div>`;
+        }
+
+        function renderIntro() {
+            const content = t[state.lang];
+            return `
+                ${renderHeader()}
+                <div class="flex-1 flex flex-col items-center justify-center text-center p-12 animate-fade-in relative overflow-hidden mt-10" onclick="setStep('selection')">
+                    <div class="absolute w-[500px] h-[500px] bg-[#F2D4D7] rounded-full blur-[100px] opacity-30 animate-pulse"></div>
+                    <div class="relative z-10 cursor-pointer">
+                        <div class="w-24 h-24 border-2 border-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-8 bg-white/50 backdrop-blur-sm shadow-lg"><i data-lucide="sparkles" class="w-10 h-10 text-[#D4AF37] animate-pulse"></i></div>
+                        <h1 class="text-5xl md:text-6xl font-bold mb-6 tracking-widest text-[#1A3C34] leading-tight mt-4">${content.title}</h1>
+                        <div class="h-1 w-20 bg-[#D4AF37] mx-auto my-8"></div>
+                        <p class="text-lg text-[#1A3C34]/70 leading-loose tracking-widest">${content.subtitle}</p>
+                        <div class="mt-12 animate-bounce text-[#D4AF37]"><span class="text-sm tracking-[0.3em] uppercase">${content.touchStart}</span></div>
+                    </div>
+                    <div class="absolute bottom-4 w-full px-8 flex justify-center opacity-60"><p class="text-[9px] text-gray-500 tracking-wider leading-tight max-w-[90%]">${content.disclaimer}</p></div>
+                </div>`;
+        }
+
+        function renderSelection() {
+            const content = t[state.lang];
+            return `
+                ${renderHeader()}
+                <div class="flex-1 flex flex-col pt-24 pb-10 px-6 md:px-16 bg-[#FDFBF7] animate-slide-up">
+                    <div class="text-center mb-6"><h2 class="text-3xl font-bold tracking-widest text-[#1A3C34] leading-relaxed">${content.questionTitle}</h2><div class="w-8 h-1 bg-[#D4AF37] mx-auto my-4"></div><p class="text-sm text-gray-500 tracking-wider">${content.questionSub}</p></div>
+                    <div class="flex-1 overflow-y-auto pt-4 pb-4 px-2 scrollbar-hide"><div class="grid grid-cols-2 md:grid-cols-4 gap-6 content-start">
+                        ${diagnosisData.map(item => `
+                            <button onclick="handleSelect('${item.id}')" class="group relative bg-white border-2 border-transparent rounded-2xl p-4 pb-8 flex flex-col items-center justify-between shadow-sm hover:border-[#D4AF37] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${getCardSizeClass()}">
+                                <div class="p-3 rounded-full bg-gray-50 group-hover:bg-[#1A3C34] group-hover:text-[#D4AF37] text-[#1A3C34] transition-colors duration-500 mt-2"><i data-lucide="${item.icon}" class="w-8 h-8"></i></div>
+                                <div class="text-center w-full px-1"><h3 class="font-bold tracking-wide text-[#1A3C34] mb-1 leading-tight ${state.lang === 'zh' ? 'text-lg whitespace-nowrap' : 'text-xs'}">${item.content[state.lang].label}</h3><p class="text-[9px] text-gray-400 uppercase tracking-widest">${item.content[state.lang].subLabel}</p></div>
+                                <div class="absolute bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#D4AF37]"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
+                            </button>`).join('')}
+                    </div></div>
+                </div>`;
+        }
+
+        function renderProcessing() {
+            const content = t[state.lang];
+            return `
+                ${renderHeader()}
+                <div class="flex-1 flex flex-col items-center justify-center bg-[#0A3F2F] text-white">
+                    <div class="relative"><div class="absolute inset-0 border-4 border-[#D4AF37]/20 rounded-full animate-ping"></div><div class="w-24 h-24 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin flex items-center justify-center"></div><i data-lucide="flask-conical" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#D4AF37] w-8 h-8"></i></div>
+                    <p class="mt-10 tracking-[0.3em] font-light text-xl animate-pulse">${content.processing}</p>
+                    <p class="text-xs text-white/40 mt-3 tracking-widest uppercase">${content.processingSub}</p>
+                </div>`;
+        }
+
+        function renderResult() {
+            const content = t[state.lang];
+            const resultItem = diagnosisData.find(d => d.id === state.selectedId);
+            const resultContent = resultItem.content[state.lang];
+            // 為了預覽，如果沒有圖片檔案，這裡使用 Unsplash 示意圖，您存檔後請使用您的圖片並確保檔名正確
+            const fallbackImage = `https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80`; 
+            
+            return `
+                ${renderHeader()}
+                <div class="flex-1 flex flex-col md:flex-row items-stretch bg-[#FDFBF7] animate-fade-in">
+                    <!-- 左側 (僅顯示 Icon, 移除商品圖) -->
+                    <div class="w-full md:w-5/12 ${resultItem.color} p-8 flex flex-col items-center justify-center text-center relative overflow-hidden transition-colors duration-700">
+                        <div class="absolute -right-12 -bottom-12 opacity-10 scale-[2.5] ${resultItem.accent}"><i data-lucide="${resultItem.icon}" class="w-32 h-32"></i></div>
+                        
+                        <div class="relative z-10 mb-6 flex justify-center items-center">
+                            <div class="w-28 h-28 rounded-full border-4 ${resultItem.border} flex items-center justify-center bg-white/60 shadow-lg backdrop-blur-sm"><span class="${resultItem.accent}"><i data-lucide="${resultItem.icon}" class="w-12 h-12"></i></span></div>
+                        </div>
+
+                        <h3 class="font-bold tracking-[0.2em] ${resultItem.accent} mb-2 ${state.lang === 'zh' ? 'text-2xl' : 'text-xl'}">${resultContent.label}</h3>
+                        <div class="h-[2px] w-12 ${resultItem.accent} opacity-50 my-4"></div>
+                        <p class="text-xs tracking-widest uppercase opacity-80 ${resultItem.accent}">Herban Diagnosis</p>
+                    </div>
+
+                    <!-- 右側內容 -->
+                    <div class="w-full md:w-7/12 p-8 md:p-12 flex flex-col bg-white relative overflow-y-auto scrollbar-hide overflow-hidden">
+                        
+                        ${!state.showIngredients ? `
+                            <div class="flex flex-col h-full justify-between animate-slide-up relative z-10">
+                                <div class="space-y-6">
+                                    <div><span class="text-[#D4AF37] text-xs font-bold tracking-[0.3em] uppercase block mb-3">${content.recommendation}</span><h2 class="font-bold text-[#1A3C34] mb-2 ${state.lang === 'zh' ? 'text-4xl whitespace-nowrap' : 'text-3xl'}">${resultContent.product}</h2><p class="text-sm text-gray-500 font-serif italic">${resultContent.engName}</p></div>
+                                    <div class="pl-6 border-l-4 border-[#1A3C34]"><p class="text-xl font-bold text-[#1A3C34] leading-relaxed">「${resultContent.slogan}」</p></div>
+                                    <p class="text-slate-600 leading-loose tracking-wide text-justify text-lg">${resultContent.desc}</p>
+                                </div>
+                                <div class="pt-8 space-y-4">
+                                    <button onclick="toggleIngredients(true)" class="group w-full border-2 border-[#1A3C34] text-[#1A3C34] py-5 rounded-xl tracking-[0.2em] font-bold hover:bg-[#1A3C34] hover:text-[#D4AF37] transition-all duration-300 flex items-center justify-center gap-3 shadow-sm hover:shadow-lg"><i data-lucide="info" class="w-5 h-5"></i>${content.checkIngredients}<i data-lucide="arrow-right" class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"></i></button>
+                                    <button onclick="backToSelection()" class="w-full py-3 text-gray-400 hover:text-[#1A3C34] text-sm tracking-widest transition-colors flex items-center justify-center gap-2"><i data-lucide="undo-2" class="w-4 h-4"></i>${content.backToSelection}</button>
+                                    
+                                    <!-- V21: 產品圖顯示區 (放大版) -->
+                                    <div class="w-full mt-8 flex justify-center img-fade-in">
+                                        <!-- 優先使用本地圖檔，若無則不顯示 -->
+                                        <img src="${resultItem.image}" 
+                                             class="w-full h-80 object-contain drop-shadow-xl product-float" 
+                                             onerror="this.src='${fallbackImage}';">
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-8 border-t border-gray-100"><p class="text-[9px] text-gray-400 text-center leading-relaxed">${content.disclaimer}</p></div>
+                            </div>
+                        ` : `
+                            <div class="flex flex-col h-full animate-scale-in relative z-10">
+                                <button onclick="toggleIngredients(false)" class="flex items-center text-gray-400 hover:text-[#1A3C34] transition-colors mb-4 group w-fit"><i data-lucide="chevron-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i><span class="text-sm tracking-widest ml-1">${content.backToIntro}</span></button>
+                                <h2 class="text-2xl font-bold text-[#1A3C34] mb-4 flex items-center gap-3"><i data-lucide="leaf" class="text-[#D4AF37] w-6 h-6"></i>${content.ingredientsTitle}</h2>
+                                <div class="bg-[#FDFBF7]/90 backdrop-blur-sm p-6 rounded-xl border border-[#D4AF37]/30 mb-6 flex-grow w-full"><ul class="grid grid-cols-2 gap-y-3 gap-x-4">${resultContent.ingredients.map(ing => `<li class="flex items-center text-base text-[#1A3C34]"><span class="w-1.5 h-1.5 bg-[#D4AF37] rounded-full mr-2.5 shrink-0"></span><span class="break-words">${ing}</span></li>`).join('')}</ul><div class="mt-4 pt-3 border-t border-[#1A3C34]/10"><p class="text-xs text-gray-500 tracking-wider">${content.originNote}</p></div></div>
+                                <div class="bg-white/90 backdrop-blur-sm border-2 border-[#1A3C34] rounded-xl p-5 shadow-lg w-full"><h3 class="text-sm text-[#D4AF37] tracking-[0.2em] font-bold uppercase mb-3 flex items-center gap-2"><i data-lucide="tag" class="w-4 h-4"></i> ${content.specTitle}</h3><div class="space-y-3">${resultContent.specs.map(spec => `<div class="flex justify-between items-center border-b border-gray-100 last:border-0 pb-3 last:pb-0"><div class="flex-1 pr-2 min-w-0"><p class="font-bold text-[#1A3C34] text-base truncate md:whitespace-normal">${spec.name}</p><p class="text-xs text-gray-500 mt-1 break-words">${spec.desc}</p></div><p class="font-bold text-[#1A3C34] text-xl shrink-0 whitespace-nowrap">${spec.price}</p></div>`).join('')}</div>${resultContent.brewing ? `<div class="mt-4 pt-3 border-t border-gray-100 flex items-start gap-2"><i data-lucide="flask-conical" class="text-[#D4AF37] w-3.5 h-3.5 mt-1 shrink-0"></i><p class="text-xs text-gray-500 leading-relaxed"><span class="font-bold text-[#1A3C34]">${content.brewingTitle}</span>${resultContent.brewing}</p></div>` : ''}</div>
+                                <div class="text-center mt-4"><p class="text-[#1A3C34] text-xs font-bold tracking-widest animate-pulse">${content.cta}</p></div>
+                            </div>
+                        `}
+                    </div>
+                </div>`;
+        }
+
+        function render() {
+            let html = '';
+            switch(state.step) {
+                case 'intro': html = renderIntro(); break;
+                case 'selection': html = renderSelection(); break;
+                case 'processing': html = renderProcessing(); break;
+                case 'result': html = renderResult(); break;
+            }
+            app.innerHTML = html + `<div class="h-4 bg-[#1A3C34] w-full mt-auto flex items-center justify-center"><div class="w-1/3 h-1 bg-[#D4AF37]/50 rounded-full"></div></div>`;
+            lucide.createIcons();
+        }
+
+        render();
+    </script>
+</body>
+</html>
