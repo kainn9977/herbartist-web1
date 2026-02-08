@@ -131,7 +131,6 @@
         };
 
         // --- 3. 產品資料庫 ---
-        // 重要：這裡的 image 屬性直接對應您的檔案名稱，請確保圖片檔名大小寫完全一致
         const diagnosisData = [
             {
                 id: 'heavy', icon: 'wind', color: 'bg-green-50', accent: 'text-green-800', border: 'border-green-200', image: 'product_heavy.png',
@@ -167,7 +166,7 @@
                     en: { label: 'After Meal', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: 'Barley Scent ‧ Refreshing', desc: 'A cup after meals to relieve greasiness. Let the body burden metabolize naturally.', ingredients: ['Barley', 'Corn Silk', 'Cassia Seed'], 
                           specs: [{ name: 'Bag (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
-                    jp: { label: '食後の重み', subLabel: 'Digestion', product: '大麦決明子茶', engName: 'Barley & Cassia Tea', slogan: '麦の香り ‧ すっきり爽やか', desc: '食後の一杯に。脂っこさを消し、体を軽やかに保ちます。', ingredients: ['大麦', 'トウモロコシのひげ', '決明子'], 
+                    jp: { label: '食後の重み', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: '麦の香り ‧ すっきり爽やか', desc: '食後の一杯に。脂っこさを消し、体を軽やかに保ちます。', ingredients: ['大麦', 'トウモロコシのひげ', '決明子'], 
                           specs: [{ name: '袋入り (10入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
@@ -189,37 +188,52 @@
             {
                 id: 'cold', icon: 'heart', color: 'bg-red-50', accent: 'text-red-800', border: 'border-red-200', image: 'product_cold.png',
                 content: {
-                    zh: { label: '手腳冰冷', subLabel: 'Cold Hands', product: '抹上口紅前', engName: '紅棗南薑茶', slogan: '暖身防護 ‧ 溫潤舒活', desc: '老薑的暖意加上紅棗的甘甜，由內而外升溫。適合空調房久坐、需要好氣色的妳。', ingredients: ['紅棗', '南薑', '魚腥草', '甘草', '桑葉'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    zh: { label: '手腳冰冷', subLabel: 'Cold Hands', 
+                          product: '抹上口紅前', 
+                          engName: '紅棗南薑茶', 
+                          slogan: '暖身防護 ‧ 溫潤舒活', desc: '老薑的暖意加上紅棗的甘甜，由內而外升溫。適合空調房久坐、需要好氣色的妳。', ingredients: ['紅棗', '南薑', '魚腥草', '甘草', '桑葉'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
                     en: { label: 'Feeling Cold', subLabel: 'Cold Hands', 
-                          product: 'Before Lipstick', 
-                          engName: 'Red Date & Galangal', slogan: 'Warming ‧ Comforting', desc: 'The warmth of old ginger meets red dates. Perfect for AC rooms and glowing skin.', ingredients: ['Red Date', 'Galangal', 'Houttuynia', 'Licorice', 'Mulberry Leaf'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                          product: 'Red Date & Galangal Tea', 
+                          engName: 'Red Date & Galangal', 
+                          slogan: 'Warming ‧ Comforting', desc: 'The warmth of old ginger meets red dates. Perfect for AC rooms and glowing skin.', ingredients: ['Red Date', 'Galangal', 'Houttuynia', 'Licorice', 'Mulberry Leaf'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '冷え性', subLabel: 'Cold Hands', 
-                          product: '口紅を塗る前に', 
-                          engName: 'Red Date & Galangal Tea', slogan: '温活 ‧ 潤い', desc: '生姜の温かさとナツメの甘さ。冷房対策や顔色を良くしたい方に最適です。', ingredients: ['ナツメ', '南姜', 'ドクダミ', '甘草', '桑の葉'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                          product: 'ナツメと南姜の茶', 
+                          engName: 'Red Date & Galangal Tea', 
+                          slogan: '温活 ‧ 潤い', desc: '生姜の温かさとナツメの甘さ。冷房対策や顔色を良くしたい方に最適です。', ingredients: ['ナツメ', '南姜', 'ドクダミ', '甘草', '桑の葉'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
             },
             {
                 id: 'sleep', icon: 'moon', color: 'bg-indigo-50', accent: 'text-indigo-800', border: 'border-indigo-200', image: 'product_sleep.png',
                 content: {
-                    zh: { label: '思緒紛亂', subLabel: 'Insomnia', product: '午後的脫妝', engName: '龍眼花洋甘菊茶', slogan: '靜謐之夜 ‧ 夢境引導', desc: '龍眼花的蜜香交織洋甘菊的安撫，讓緊繃的思緒慢慢鬆開。不含咖啡因，是睡前最溫柔的儀式。', ingredients: ['龍眼花', '洋甘菊', '大花咸豐草', '百合'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    zh: { label: '思緒紛亂', subLabel: 'Insomnia', 
+                          product: '午後的脫妝', 
+                          engName: '龍眼花洋甘菊茶', 
+                          slogan: '靜謐之夜 ‧ 夢境引導', desc: '龍眼花的蜜香交織洋甘菊的安撫，讓緊繃的思緒慢慢鬆開。不含咖啡因，是睡前最溫柔的儀式。', ingredients: ['龍眼花', '洋甘菊', '大花咸豐草', '百合'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
                     en: { label: 'Restless Mind', subLabel: 'Insomnia', 
-                          product: 'Afternoon Touch-up', 
-                          engName: 'Longan & Chamomile', slogan: 'Silent Night ‧ Dream Guide', desc: 'Honey scent of Longan flowers meets Chamomile. Caffeine-free, gentle ritual before bed.', ingredients: ['Longan Flower', 'Chamomile', 'Bidens Alba', 'Lily Bulb'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                          product: 'Longan & Chamomile Tea', 
+                          engName: 'Longan & Chamomile', 
+                          slogan: 'Silent Night ‧ Dream Guide', desc: 'Honey scent of Longan flowers meets Chamomile. Caffeine-free, gentle ritual before bed.', ingredients: ['Longan Flower', 'Chamomile', 'Bidens Alba', 'Lily Bulb'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '考え事が多い', subLabel: 'Insomnia', 
-                          product: '午後の化粧崩れ', 
-                          engName: 'Longan & Chamomile Tea', slogan: '静寂の夜 ‧ 夢への誘い', desc: '龍眼花の蜜の香りとカモミールの安らぎ。ノンカフェインで、お休み前の優しい儀式に。', ingredients: ['龍眼花', 'カモミール', 'タチアワユキセンダングサ', '百合'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                          product: 'Longan & Chamomile Tea', 
+                          engName: 'Longan & Chamomile', 
+                          slogan: '静寂の夜 ‧ 夢への誘い', desc: '龍眼花の蜜の香りとカモミールの安らぎ。ノンカフェインで、お休み前の優しい儀式に。', ingredients: ['龍眼花', 'カモミール', 'タチアワユキセンダングサ', '百合'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
             },
             {
                 id: 'period', icon: 'star', color: 'bg-orange-50', accent: 'text-orange-800', border: 'border-orange-200', image: 'product_period.png',
                 content: {
-                    zh: { label: '月月不適', subLabel: 'Period Care', product: '素顏悄悄話', engName: '土肉桂枸杞茶', slogan: '溫柔調理 ‧ 暖心呵護', desc: '台灣原生土肉桂的獨特香氣，像暖暖包一樣貼心，陪伴妳度過敏感時刻。溫潤不燥熱。', ingredients: ['土肉桂', '甘草', '枸杞', '洋甘菊', '玫瑰果'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    zh: { label: '月月不適', subLabel: 'Period Care', 
+                          product: '素顏悄悄話', 
+                          engName: '土肉桂枸杞茶', 
+                          slogan: '溫柔調理 ‧ 暖心呵護', desc: '台灣原生土肉桂的獨特香氣，像暖暖包一樣貼心，陪伴妳度過敏感時刻。溫潤不燥熱。', ingredients: ['土肉桂', '甘草', '枸杞', '洋甘菊', '玫瑰果'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
                     en: { label: 'Period Care', subLabel: 'Monthly Care', 
-                          product: 'Whisper of Bare Skin', 
-                          engName: 'Indigenous Cinnamon', slogan: 'Gentle Care ‧ Warming', desc: 'Unique aroma of Indigenous Cinnamon. Like a warm hug during sensitive times.', ingredients: ['Indigenous Cinnamon', 'Licorice', 'Goji Berry', 'Chamomile', 'Rosehip'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                          product: 'Cinnamon & Goji Tea', 
+                          engName: 'Indigenous Cinnamon', 
+                          slogan: 'Gentle Care ‧ Warming', desc: 'Unique aroma of Indigenous Cinnamon. Like a warm hug during sensitive times.', ingredients: ['Indigenous Cinnamon', 'Licorice', 'Goji Berry', 'Chamomile', 'Rosehip'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '女性の悩み', subLabel: 'Period Care', 
-                          product: 'すっぴんの囁き', 
-                          engName: 'Cinnamon & Goji Tea', slogan: '優しい調理 ‧ 心温まるケア', desc: '台湾原生シナモンの独特な香り。敏感な時期に、カイロのように寄り添います。', ingredients: ['台湾シナモン', '甘草', 'クコの実', 'カモミール', 'ローズヒップ'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                          product: '台湾シナモンクコ茶', 
+                          engName: 'Cinnamon & Goji Tea', 
+                          slogan: '優しい調理 ‧ 心温まるケア', desc: '台湾原生シナモンの独特な香り。敏感な時期に、カイロのように寄り添います。', ingredients: ['台湾シナモン', '甘草', 'クコの実', 'カモミール', 'ローズヒップ'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
             },
             {
@@ -243,9 +257,7 @@
         window.toggleIngredients = function(show) { state.showIngredients = show; render(); };
 
         // 強制正方形卡片
-        function getCardSizeClass() {
-            return 'aspect-square'; 
-        }
+        function getCardSizeClass() { return 'aspect-square'; }
 
         // --- 5. 渲染函數 ---
         function renderHeader() {
@@ -318,6 +330,9 @@
             const resultItem = diagnosisData.find(d => d.id === state.selectedId);
             const resultContent = resultItem.content[state.lang];
             
+            // 為了預覽，如果沒有本地圖片則使用 Unsplash 示意圖
+            const fallbackImage = `https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80`; 
+            
             return `
                 ${renderHeader()}
                 <div class="flex-1 flex flex-col md:flex-row items-stretch bg-[#FDFBF7] animate-fade-in">
@@ -348,22 +363,22 @@
                                     <button onclick="toggleIngredients(true)" class="group w-full border-2 border-[#1A3C34] text-[#1A3C34] py-5 rounded-xl tracking-[0.2em] font-bold hover:bg-[#1A3C34] hover:text-[#D4AF37] transition-all duration-300 flex items-center justify-center gap-3 shadow-sm hover:shadow-lg"><i data-lucide="info" class="w-5 h-5"></i>${content.checkIngredients}<i data-lucide="arrow-right" class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"></i></button>
                                     <button onclick="backToSelection()" class="w-full py-3 text-gray-400 hover:text-[#1A3C34] text-sm tracking-widest transition-colors flex items-center justify-center gap-2"><i data-lucide="undo-2" class="w-4 h-4"></i>${content.backToSelection}</button>
                                     
-                                    <!-- V26/V27: 產品圖顯示區 (按鈕下方, 防破圖設定) -->
-                                    <!-- 重要：移除 onerror 連線備用圖，避免網路問題導致破圖 -->
-                                    <div class="w-full mt-4 flex justify-center img-fade-in">
+                                    <!-- V28: 產品圖顯示區 (放大) -->
+                                    <div class="w-full mt-8 flex justify-center img-fade-in">
+                                        <!-- 優先使用本地圖檔，若無則不顯示 -->
                                         <img src="${resultItem.image}" 
-                                             class="w-full h-32 object-contain drop-shadow-lg" 
-                                             onerror="this.style.display='none'">
+                                             class="w-[90%] h-auto max-h-[500px] object-contain drop-shadow-xl product-float" 
+                                             onerror="this.src='${fallbackImage}';">
                                     </div>
                                 </div>
-                                <div class="mt-auto pt-4 border-t border-gray-100"><p class="text-[9px] text-gray-400 text-center leading-relaxed">${content.disclaimer}</p></div>
+                                <div class="mt-auto pt-8 border-t border-gray-100"><p class="text-[9px] text-gray-400 text-center leading-relaxed">${content.disclaimer}</p></div>
                             </div>
                         ` : `
                             <div class="flex flex-col h-full animate-scale-in relative z-10">
                                 <button onclick="toggleIngredients(false)" class="flex items-center text-gray-400 hover:text-[#1A3C34] transition-colors mb-4 group w-fit"><i data-lucide="chevron-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i><span class="text-sm tracking-widest ml-1">${content.backToIntro}</span></button>
                                 <h2 class="text-2xl font-bold text-[#1A3C34] mb-4 flex items-center gap-3"><i data-lucide="leaf" class="text-[#D4AF37] w-6 h-6"></i>${content.ingredientsTitle}</h2>
                                 <div class="bg-[#FDFBF7]/90 backdrop-blur-sm p-6 rounded-xl border border-[#D4AF37]/30 mb-6 flex-grow w-full"><ul class="grid grid-cols-2 gap-y-3 gap-x-4">${resultContent.ingredients.map(ing => `<li class="flex items-center text-base text-[#1A3C34]"><span class="w-1.5 h-1.5 bg-[#D4AF37] rounded-full mr-2.5 shrink-0"></span><span class="break-words">${ing}</span></li>`).join('')}</ul><div class="mt-4 pt-3 border-t border-[#1A3C34]/10"><p class="text-xs text-gray-500 tracking-wider">${content.originNote}</p></div></div>
-                                <div class="bg-white/90 backdrop-blur-sm border-2 border-[#1A3C34] rounded-xl p-5 shadow-lg w-full"><h3 class="text-sm text-[#D4AF37] tracking-[0.2em] font-bold uppercase mb-3 flex items-center gap-2"><i data-lucide="tag" class="w-4 h-4"></i> ${content.specTitle}</h3><div class="space-y-3">${resultContent.specs.map(spec => `<div class="flex justify-between items-center border-b border-gray-100 last:border-0 pb-3 last:pb-0"><div class="flex-1 pr-2 min-w-0"><p class="font-bold text-[#1A3C34] text-base leading-tight">${spec.name}</p><p class="text-xs text-gray-500 mt-1 break-words">${spec.desc}</p></div><p class="font-bold text-[#1A3C34] text-xl shrink-0 whitespace-nowrap">${spec.price}</p></div>`).join('')}</div>${resultContent.brewing ? `<div class="mt-4 pt-3 border-t border-gray-100 flex items-start gap-2"><i data-lucide="flask-conical" class="text-[#D4AF37] w-3.5 h-3.5 mt-1 shrink-0"></i><p class="text-xs text-gray-500 leading-relaxed"><span class="font-bold text-[#1A3C34]">${content.brewingTitle}</span>${resultContent.brewing}</p></div>` : ''}</div>
+                                <div class="bg-white/90 backdrop-blur-sm border-2 border-[#1A3C34] rounded-xl p-5 shadow-lg w-full"><h3 class="text-sm text-[#D4AF37] tracking-[0.2em] font-bold uppercase mb-3 flex items-center gap-2"><i data-lucide="tag" class="w-4 h-4"></i> ${content.specTitle}</h3><div class="space-y-3">${resultContent.specs.map(spec => `<div class="flex justify-between items-center border-b border-gray-100 last:border-0 pb-3 last:pb-0"><div class="flex-1 pr-2 min-w-0"><p class="font-bold text-[#1A3C34] text-base truncate md:whitespace-normal">${spec.name}</p><p class="text-xs text-gray-500 mt-1 break-words">${spec.desc}</p></div><p class="font-bold text-[#1A3C34] text-xl shrink-0 whitespace-nowrap">${spec.price}</p></div>`).join('')}</div>${resultContent.brewing ? `<div class="mt-4 pt-3 border-t border-gray-100 flex items-start gap-2"><i data-lucide="flask-conical" class="text-[#D4AF37] w-3.5 h-3.5 mt-1 shrink-0"></i><p class="text-xs text-gray-500 leading-relaxed"><span class="font-bold text-[#1A3C34]">${content.brewingTitle}</span>${resultContent.brewing}</p></div>` : ''}</div>
                                 <div class="text-center mt-4"><p class="text-[#1A3C34] text-xs font-bold tracking-widest animate-pulse">${content.cta}</p></div>
                             </div>
                         `}
