@@ -33,11 +33,18 @@
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
         
-        /* 浮水印進場特效 */
         .watermark-fade { animation: watermarkIn 1.5s ease-out forwards; }
         @keyframes watermarkIn { 
             from { opacity: 0; transform: scale(0.9) translateY(20px); } 
             to { opacity: 0.15; transform: scale(1) translateY(0); } 
+        }
+        
+        /* 產品圖浮動特效 */
+        .product-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 
+            0% { transform: translateY(0px); } 
+            50% { transform: translateY(-5px); } 
+            100% { transform: translateY(0px); } 
         }
     </style>
 </head>
@@ -124,17 +131,16 @@
         };
 
         // --- 3. 產品資料庫 ---
-        // 圖片請依此命名並放在同一資料夾 (預設為 product_*.png)
-        // 這裡為了方便預覽，如果找不到本地圖片會 fallback 到 Unsplash，但您的本地圖片會優先顯示
+        // 重要：這裡的 image 屬性直接對應您的檔案名稱，請確保圖片檔名大小寫完全一致
         const diagnosisData = [
             {
                 id: 'heavy', icon: 'wind', color: 'bg-green-50', accent: 'text-green-800', border: 'border-green-200', image: 'product_heavy.png',
                 content: {
                     zh: { label: '身體沉重', subLabel: 'Heavy Body', product: '阿公青草茶', engName: "Grandpa's Herbal Tea", slogan: '草本清香 ‧ 回甘順口', desc: '熬夜後、飲食油膩時的最佳夥伴。幫助身體回到清爽狀態，去除多餘的負擔。', ingredients: ['仙草', '鳳尾草', '白鶴靈芝', '黃花蜜菜', '甜菊葉', '紅田烏', '珠仔草'], specs: [{ name: '經典 (10入)', desc: '需煮沸 (1200ml) ‧ 味道最濃郁', price: 'NT$ 480' }, { name: '輕量 (10入)', desc: '馬克杯沖泡用 ‧ 方便快速', price: 'NT$ 300' }], 
                           brewing: '【經典】1200ml水放入茶包，滾後轉中火12分鐘撈起。<br/>【輕量】熱水沖泡5-8分鐘即可。' },
-                    en: { label: 'Heavy Body', subLabel: 'Feeling Sluggish', product: "Grandpa's Herbal Tea", engName: "Traditional Cooling Blend", slogan: 'Herbal Aroma ‧ Smooth', desc: 'Best companion after staying up late. Helps the body return to a refreshed state.', ingredients: ['Mesona', 'Pteris', 'White Crane Lingzhi', 'Wedelia', 'Stevia', 'Alternanthera', 'Phyllanthus'], specs: [{ name: 'Classic (10 packs)', desc: 'Boiling required (1200ml)', price: 'NT$ 480' }, { name: 'Light (10 packs)', desc: 'Mug brewing type', price: 'NT$ 300' }], 
+                    en: { label: 'Heavy Body', subLabel: 'Feeling Sluggish', product: "阿公青草茶", engName: "Grandpa's Herbal Tea", slogan: 'Herbal Aroma ‧ Smooth', desc: 'Best companion after staying up late. Helps the body return to a refreshed state.', ingredients: ['Mesona', 'Pteris', 'White Crane Lingzhi', 'Wedelia', 'Stevia', 'Alternanthera', 'Phyllanthus'], specs: [{ name: 'Classic (10 packs)', desc: 'Boiling required (1200ml)', price: 'NT$ 480' }, { name: 'Light (10 packs)', desc: 'Mug brewing type', price: 'NT$ 300' }], 
                           brewing: '[Classic] Boil with 1200ml water for 12 mins.<br/>[Light] Brew with hot water for 5-8 mins.' },
-                    jp: { label: '体がだるい', subLabel: 'Heavy Body', product: 'おじいちゃんの青草茶', engName: "Grandpa's Herbal Tea", slogan: 'ハーブの香り ‧ スッキリとした後味', desc: '夜更かしや脂っこい食事の後に。体に溜まった熱を冷まし、軽やかな状態へ戻します。', ingredients: ['仙草', 'イノモトソウ', '白鶴霊芝', 'クマノギク', 'ステビア', 'ツルノゲイトウ', 'コミカンソウ'], specs: [{ name: 'クラシック (10入)', desc: '要煮沸 (1200ml) ‧ 濃厚な味わい', price: 'NT$ 480' }, { name: 'ライト (10入)', desc: 'マグカップ用 ‧ 手軽に楽しめる', price: 'NT$ 300' }], 
+                    jp: { label: '体がだるい', subLabel: 'Heavy Body', product: '阿公青草茶', engName: "Grandpa's Herbal Tea", slogan: 'ハーブの香り ‧ スッキリとした後味', desc: '夜更かしや脂っこい食事の後に。体に溜まった熱を冷まし、軽やかな状態へ戻します。', ingredients: ['仙草', 'イノモトソウ', '白鶴霊芝', 'クマノギク', 'ステビア', 'ツルノゲイトウ', 'コミカンソウ'], specs: [{ name: 'クラシック (10入)', desc: '要煮沸 (1200ml) ‧ 濃厚な味わい', price: 'NT$ 480' }, { name: 'ライト (10入)', desc: 'マグカップ用 ‧ 手軽に楽しめる', price: 'NT$ 300' }], 
                           brewing: '【クラシック】1200mlの水で沸騰後、弱火で12分。<br/>【ライト】お湯で5-8分抽出。' }
                 }
             },
@@ -144,10 +150,10 @@
                     zh: { label: '缺乏元氣', subLabel: 'Low Energy', product: '黑豆牛蒡茶', engName: 'Black Bean & Burdock', slogan: '焙炒香氣 ‧ 溫潤厚實', desc: '適合久坐、外食族。作為日常的溫和滋養，找回穩定的節奏。', ingredients: ['黑大豆', '牛蒡', '大麥'], 
                           specs: [{ name: '精緻袋裝 (10入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 300' }], 
                           brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
-                    en: { label: 'Low Energy', subLabel: 'Feeling Tired', product: 'Black Bean & Burdock', engName: 'Energy Boost', slogan: 'Roasted Aroma ‧ Warm & Rich', desc: 'Perfect for sedentary office workers. Gentle nourishment to restore your daily rhythm.', ingredients: ['Black Soybean', 'Burdock Root', 'Barley'], 
+                    en: { label: 'Low Energy', subLabel: 'Feeling Tired', product: '黑豆牛蒡茶', engName: 'Black Bean & Burdock', slogan: 'Roasted Aroma ‧ Warm & Rich', desc: 'Perfect for sedentary office workers. Gentle nourishment to restore your daily rhythm.', ingredients: ['Black Soybean', 'Burdock Root', 'Barley'], 
                           specs: [{ name: 'Bag (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
-                    jp: { label: '元気がない', subLabel: 'Low Energy', product: '黒豆ごぼう茶', engName: 'Black Bean & Burdock', slogan: '香ばしい香り ‧ 温かみのある味', desc: '座りっぱなしの方や外食が多い方に。日常の優しい滋養として、リズムを整えます。', ingredients: ['黒豆', 'ごぼう', '大麦'], 
+                    jp: { label: '元気がない', subLabel: 'Low Energy', product: '黑豆牛蒡茶', engName: 'Black Bean & Burdock', slogan: '香ばしい香り ‧ 温かみのある味', desc: '座りっぱなしの方や外食が多い方に。日常の優しい滋養として、リズムを整えます。', ingredients: ['黒豆', 'ごぼう', '大麦'], 
                           specs: [{ name: '袋入り (10入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
@@ -158,7 +164,7 @@
                     zh: { label: '大餐過後', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: '麥味飄香 ‧ 決明清爽', desc: '飯後來一杯，解膩又輕盈。讓身體的負擔像落葉般自然代謝。', ingredients: ['大麥', '玉米鬚', '決明子'], 
                           specs: [{ name: '精緻袋裝 (10入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 300' }], 
                           brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
-                    en: { label: 'After Meal', subLabel: 'Digestion', product: 'Barley & Cassia Tea', engName: 'Light & Refreshing', slogan: 'Barley Scent ‧ Refreshing', desc: 'A cup after meals to relieve greasiness. Let the body burden metabolize naturally.', ingredients: ['Barley', 'Corn Silk', 'Cassia Seed'], 
+                    en: { label: 'After Meal', subLabel: 'Digestion', product: '大麥決明子茶', engName: 'Barley & Cassia Tea', slogan: 'Barley Scent ‧ Refreshing', desc: 'A cup after meals to relieve greasiness. Let the body burden metabolize naturally.', ingredients: ['Barley', 'Corn Silk', 'Cassia Seed'], 
                           specs: [{ name: 'Bag (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '食後の重み', subLabel: 'Digestion', product: '大麦決明子茶', engName: 'Barley & Cassia Tea', slogan: '麦の香り ‧ すっきり爽やか', desc: '食後の一杯に。脂っこさを消し、体を軽やかに保ちます。', ingredients: ['大麦', 'トウモロコシのひげ', '決明子'], 
@@ -172,10 +178,10 @@
                     zh: { label: '眼神疲憊', subLabel: 'Eye Strain', product: '杭菊枸杞茶', engName: 'Chrysanthemum & Goji', slogan: '花香淡雅 ‧ 自然甘甜', desc: '長時間用眼、需要放鬆時的溫柔選擇。淡淡的花香撫平視覺的躁動。', ingredients: ['杭菊', '枸杞', '決明子'], 
                           specs: [{ name: '精緻袋裝 (10入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 300' }], 
                           brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
-                    en: { label: 'Eye Strain', subLabel: 'Screen Time', product: 'Chrysanthemum & Goji', engName: 'Vision Care', slogan: 'Floral Scent ‧ Sweet', desc: 'A gentle choice for tired eyes from screen time. The floral scent soothes visual agitation.', ingredients: ['Chrysanthemum', 'Goji Berry', 'Cassia Seed'], 
+                    en: { label: 'Eye Strain', subLabel: 'Screen Time', product: '杭菊枸杞茶', engName: 'Chrysanthemum & Goji', slogan: 'Floral Scent ‧ Sweet', desc: 'A gentle choice for tired eyes from screen time. The floral scent soothes visual agitation.', ingredients: ['Chrysanthemum', 'Goji Berry', 'Cassia Seed'], 
                           specs: [{ name: 'Bag (10 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
-                    jp: { label: '目の疲れ', subLabel: 'Eye Strain', product: '菊花クコ茶', engName: 'Chrysanthemum & Goji', slogan: '花の香り ‧ 自然な甘み', desc: 'スマホやPCで目が疲れた時に。優しい花の香りが視覚の疲れを癒します。', ingredients: ['菊花', 'クコの実', '決明子'], 
+                    jp: { label: '目の疲れ', subLabel: 'Eye Strain', product: '杭菊枸杞茶', engName: 'Chrysanthemum & Goji', slogan: '花の香り ‧ 自然な甘み', desc: 'スマホやPCで目が疲れた時に。優しい花の香りが視覚の疲れを癒します。', ingredients: ['菊花', 'クコの実', '決明子'], 
                           specs: [{ name: '袋入り (10入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 300' }], 
                           brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
@@ -183,52 +189,37 @@
             {
                 id: 'cold', icon: 'heart', color: 'bg-red-50', accent: 'text-red-800', border: 'border-red-200', image: 'product_cold.png',
                 content: {
-                    zh: { label: '手腳冰冷', subLabel: 'Cold Hands', 
-                          product: '抹上口紅前', 
-                          engName: '紅棗南薑茶', 
-                          slogan: '暖身防護 ‧ 溫潤舒活', desc: '老薑的暖意加上紅棗的甘甜，由內而外升溫。適合空調房久坐、需要好氣色的妳。', ingredients: ['紅棗', '南薑', '魚腥草', '甘草', '桑葉'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    zh: { label: '手腳冰冷', subLabel: 'Cold Hands', product: '抹上口紅前', engName: '紅棗南薑茶', slogan: '暖身防護 ‧ 溫潤舒活', desc: '老薑的暖意加上紅棗的甘甜，由內而外升溫。適合空調房久坐、需要好氣色的妳。', ingredients: ['紅棗', '南薑', '魚腥草', '甘草', '桑葉'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
                     en: { label: 'Feeling Cold', subLabel: 'Cold Hands', 
-                          product: 'Red Date & Galangal Tea', 
-                          engName: 'Red Date & Galangal', 
-                          slogan: 'Warming ‧ Comforting', desc: 'The warmth of old ginger meets red dates. Perfect for AC rooms and glowing skin.', ingredients: ['Red Date', 'Galangal', 'Houttuynia', 'Licorice', 'Mulberry Leaf'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                          product: 'Before Lipstick', 
+                          engName: 'Red Date & Galangal', slogan: 'Warming ‧ Comforting', desc: 'The warmth of old ginger meets red dates. Perfect for AC rooms and glowing skin.', ingredients: ['Red Date', 'Galangal', 'Houttuynia', 'Licorice', 'Mulberry Leaf'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '冷え性', subLabel: 'Cold Hands', 
-                          product: 'ナツメと南姜の茶', 
-                          engName: 'Red Date & Galangal Tea', 
-                          slogan: '温活 ‧ 潤い', desc: '生姜の温かさとナツメの甘さ。冷房対策や顔色を良くしたい方に最適です。', ingredients: ['ナツメ', '南姜', 'ドクダミ', '甘草', '桑の葉'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                          product: '口紅を塗る前に', 
+                          engName: 'Red Date & Galangal Tea', slogan: '温活 ‧ 潤い', desc: '生姜の温かさとナツメの甘さ。冷房対策や顔色を良くしたい方に最適です。', ingredients: ['ナツメ', '南姜', 'ドクダミ', '甘草', '桑の葉'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
             },
             {
                 id: 'sleep', icon: 'moon', color: 'bg-indigo-50', accent: 'text-indigo-800', border: 'border-indigo-200', image: 'product_sleep.png',
                 content: {
-                    zh: { label: '思緒紛亂', subLabel: 'Insomnia', 
-                          product: '午後的脫妝', 
-                          engName: '龍眼花洋甘菊茶', 
-                          slogan: '靜謐之夜 ‧ 夢境引導', desc: '龍眼花的蜜香交織洋甘菊的安撫，讓緊繃的思緒慢慢鬆開。不含咖啡因，是睡前最溫柔的儀式。', ingredients: ['龍眼花', '洋甘菊', '大花咸豐草', '百合'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    zh: { label: '思緒紛亂', subLabel: 'Insomnia', product: '午後的脫妝', engName: '龍眼花洋甘菊茶', slogan: '靜謐之夜 ‧ 夢境引導', desc: '龍眼花的蜜香交織洋甘菊的安撫，讓緊繃的思緒慢慢鬆開。不含咖啡因，是睡前最溫柔的儀式。', ingredients: ['龍眼花', '洋甘菊', '大花咸豐草', '百合'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
                     en: { label: 'Restless Mind', subLabel: 'Insomnia', 
-                          product: 'Longan & Chamomile Tea', 
-                          engName: 'Longan & Chamomile', 
-                          slogan: 'Silent Night ‧ Dream Guide', desc: 'Honey scent of Longan flowers meets Chamomile. Caffeine-free, gentle ritual before bed.', ingredients: ['Longan Flower', 'Chamomile', 'Bidens Alba', 'Lily Bulb'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                          product: 'Afternoon Touch-up', 
+                          engName: 'Longan & Chamomile', slogan: 'Silent Night ‧ Dream Guide', desc: 'Honey scent of Longan flowers meets Chamomile. Caffeine-free, gentle ritual before bed.', ingredients: ['Longan Flower', 'Chamomile', 'Bidens Alba', 'Lily Bulb'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '考え事が多い', subLabel: 'Insomnia', 
-                          product: 'Longan & Chamomile Tea', 
-                          engName: 'Longan & Chamomile', 
-                          slogan: '静寂の夜 ‧ 夢への誘い', desc: '龍眼花の蜜の香りとカモミールの安らぎ。ノンカフェインで、お休み前の優しい儀式に。', ingredients: ['龍眼花', 'カモミール', 'タチアワユキセンダングサ', '百合'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                          product: '午後の化粧崩れ', 
+                          engName: 'Longan & Chamomile Tea', slogan: '静寂の夜 ‧ 夢への誘い', desc: '龍眼花の蜜の香りとカモミールの安らぎ。ノンカフェインで、お休み前の優しい儀式に。', ingredients: ['龍眼花', 'カモミール', 'タチアワユキセンダングサ', '百合'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
             },
             {
                 id: 'period', icon: 'star', color: 'bg-orange-50', accent: 'text-orange-800', border: 'border-orange-200', image: 'product_period.png',
                 content: {
-                    zh: { label: '月月不適', subLabel: 'Period Care', 
-                          product: '素顏悄悄話', 
-                          engName: '土肉桂枸杞茶', 
-                          slogan: '溫柔調理 ‧ 暖心呵護', desc: '台灣原生土肉桂的獨特香氣，像暖暖包一樣貼心，陪伴妳度過敏感時刻。溫潤不燥熱。', ingredients: ['土肉桂', '甘草', '枸杞', '洋甘菊', '玫瑰果'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
+                    zh: { label: '月月不適', subLabel: 'Period Care', product: '素顏悄悄話', engName: '土肉桂枸杞茶', slogan: '溫柔調理 ‧ 暖心呵護', desc: '台灣原生土肉桂的獨特香氣，像暖暖包一樣貼心，陪伴妳度過敏感時刻。溫潤不燥熱。', ingredients: ['土肉桂', '甘草', '枸杞', '洋甘菊', '玫瑰果'], specs: [{ name: '精緻盒裝 (6入)', desc: '馬克杯用 (350-500ml)', price: 'NT$ 360' }], brewing: '務必以熱水沖泡，5-8 分鐘即可出味，可回沖 2-3 次。' },
                     en: { label: 'Period Care', subLabel: 'Monthly Care', 
-                          product: 'Cinnamon & Goji Tea', 
-                          engName: 'Indigenous Cinnamon', 
-                          slogan: 'Gentle Care ‧ Warming', desc: 'Unique aroma of Indigenous Cinnamon. Like a warm hug during sensitive times.', ingredients: ['Indigenous Cinnamon', 'Licorice', 'Goji Berry', 'Chamomile', 'Rosehip'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
+                          product: 'Whisper of Bare Skin', 
+                          engName: 'Indigenous Cinnamon', slogan: 'Gentle Care ‧ Warming', desc: 'Unique aroma of Indigenous Cinnamon. Like a warm hug during sensitive times.', ingredients: ['Indigenous Cinnamon', 'Licorice', 'Goji Berry', 'Chamomile', 'Rosehip'], specs: [{ name: 'Gift Box (6 packs)', desc: 'For Mug (350-500ml)', price: 'NT$ 360' }], brewing: 'Brew with hot water for 5-8 mins. Can be re-brewed 2-3 times.' },
                     jp: { label: '女性の悩み', subLabel: 'Period Care', 
-                          product: '台湾シナモンクコ茶', 
-                          engName: 'Cinnamon & Goji Tea', 
-                          slogan: '優しい調理 ‧ 心温まるケア', desc: '台湾原生シナモンの独特な香り。敏感な時期に、カイロのように寄り添います。', ingredients: ['台湾シナモン', '甘草', 'クコの実', 'カモミール', 'ローズヒップ'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
+                          product: 'すっぴんの囁き', 
+                          engName: 'Cinnamon & Goji Tea', slogan: '優しい調理 ‧ 心温まるケア', desc: '台湾原生シナモンの独特な香り。敏感な時期に、カイロのように寄り添います。', ingredients: ['台湾シナモン', '甘草', 'クコの実', 'カモミール', 'ローズヒップ'], specs: [{ name: 'ギフト箱 (6入)', desc: 'マグカップ用 (350-500ml)', price: 'NT$ 360' }], brewing: 'お湯で5-8分抽出してください。2-3回楽しめます。' }
                 }
             },
             {
@@ -236,7 +227,7 @@
                 content: {
                     zh: { label: '想喝一杯', subLabel: 'Chill Vibes', product: '青草茶啤酒', engName: 'Herbal Sparkling Beer', slogan: '都會微醺 ‧ 泡沫綿密', desc: '將老祖宗的智慧打入綿密氣泡。大人味的清爽特調，派對狂歡的獨特選擇。', ingredients: ['仙草', '鳳尾草', '白鶴靈芝', '黃花蜜菜', '甜菊葉', '紅田烏', '珠仔草', '酵母'], specs: [{ name: '瓶裝 (330ml)', desc: '酒精濃度：4.8%', price: 'NT$ 180' }], brewing: '冷藏飲用風味更佳，開瓶後請盡快飲用。' },
                     en: { label: 'Chill Vibes', subLabel: 'Sparkling Beer', product: '青草茶啤酒', engName: 'Herbal Sparkling Beer', slogan: 'Urban Chill ‧ Creamy', desc: 'Ancestral wisdom infused into bubbles. A refreshing herbal beer for a unique party vibe.', ingredients: ['Mesona', 'Pteris', 'White Crane Lingzhi', 'Wedelia', 'Stevia', 'Alternanthera', 'Phyllanthus', 'Yeast'], specs: [{ name: 'Bottle (330ml)', desc: 'ABV: 4.8%', price: 'NT$ 180' }], brewing: 'Best served chilled. Drink immediately after opening.' },
-                    jp: { label: '一杯飲みたい', subLabel: 'Chill Vibes', product: '青草茶ビール', engName: 'Herbal Sparkling Beer', slogan: '都会の微酔 ‧ クリーミー', desc: '先人の知恵を炭酸に込めました。爽やかなハーバルビールで、特別なひとときを。', ingredients: ['仙草', 'イノモトソウ', '白鶴霊芝', 'クマノギク', 'ステビア', 'ツルノゲイトウ', 'コミカンソウ', '酵母'], specs: [{ name: '瓶 (330ml)', desc: 'アルコール分：4.8%', price: 'NT$ 180' }], brewing: '冷やして飲むのがおすすめ。開封後はお早めに。' }
+                    jp: { label: '一杯飲みたい', subLabel: 'Chill Vibes', product: '青草茶啤酒', engName: 'Herbal Sparkling Beer', slogan: '都会の微酔 ‧ クリーミー', desc: '先人の知恵を炭酸に込めました。爽やかなハーバルビールで、特別なひとときを。', ingredients: ['仙草', 'イノモトソウ', '白鶴霊芝', 'クマノギク', 'ステビア', 'ツルノゲイトウ', 'コミカンソウ', '酵母'], specs: [{ name: '瓶 (330ml)', desc: 'アルコール分：4.8%', price: 'NT$ 180' }], brewing: '冷やして飲むのがおすすめ。開封後はお早めに。' }
                 }
             }
         ];
@@ -327,9 +318,6 @@
             const resultItem = diagnosisData.find(d => d.id === state.selectedId);
             const resultContent = resultItem.content[state.lang];
             
-            // 為了預覽，如果沒有本地圖片則使用 Unsplash 示意圖
-            const fallbackImage = `https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80`; 
-            
             return `
                 ${renderHeader()}
                 <div class="flex-1 flex flex-col md:flex-row items-stretch bg-[#FDFBF7] animate-fade-in">
@@ -349,11 +337,6 @@
                     <!-- 右側內容 -->
                     <div class="w-full md:w-7/12 p-8 md:p-12 flex flex-col bg-white relative overflow-y-auto scrollbar-hide overflow-hidden">
                         
-                        <!-- 背景浮水印商品圖 -->
-                        <div class="absolute -bottom-10 -right-10 w-96 h-96 opacity-15 pointer-events-none z-0">
-                             <img src="${resultItem.image}" alt="" class="w-full h-full object-contain watermark-fade" onerror="this.style.display='none'">
-                        </div>
-
                         ${!state.showIngredients ? `
                             <div class="flex flex-col h-full justify-between animate-slide-up relative z-10">
                                 <div class="space-y-6">
@@ -364,6 +347,14 @@
                                 <div class="pt-8 space-y-4">
                                     <button onclick="toggleIngredients(true)" class="group w-full border-2 border-[#1A3C34] text-[#1A3C34] py-5 rounded-xl tracking-[0.2em] font-bold hover:bg-[#1A3C34] hover:text-[#D4AF37] transition-all duration-300 flex items-center justify-center gap-3 shadow-sm hover:shadow-lg"><i data-lucide="info" class="w-5 h-5"></i>${content.checkIngredients}<i data-lucide="arrow-right" class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"></i></button>
                                     <button onclick="backToSelection()" class="w-full py-3 text-gray-400 hover:text-[#1A3C34] text-sm tracking-widest transition-colors flex items-center justify-center gap-2"><i data-lucide="undo-2" class="w-4 h-4"></i>${content.backToSelection}</button>
+                                    
+                                    <!-- V26/V27: 產品圖顯示區 (按鈕下方, 防破圖設定) -->
+                                    <!-- 重要：移除 onerror 連線備用圖，避免網路問題導致破圖 -->
+                                    <div class="w-full mt-4 flex justify-center img-fade-in">
+                                        <img src="${resultItem.image}" 
+                                             class="w-full h-32 object-contain drop-shadow-lg" 
+                                             onerror="this.style.display='none'">
+                                    </div>
                                 </div>
                                 <div class="mt-auto pt-4 border-t border-gray-100"><p class="text-[9px] text-gray-400 text-center leading-relaxed">${content.disclaimer}</p></div>
                             </div>
